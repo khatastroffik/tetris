@@ -1,0 +1,13 @@
+/** INTENDED FOR CODE EDITOR SYNTAX SUPPORT*/
+{
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": "../node_modules",
+    "target": "ES2016",
+    "lib": ["ES2018", "dom"],
+    "types": ["cypress"]
+  },
+  "include": [
+    "**/*.ts"
+  ]
+}

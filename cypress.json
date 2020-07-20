@@ -1,0 +1,6 @@
+{
+  "baseUrl": "http://localhost:4200",
+  "ignoreTestFiles": ["*.hot-update.js", "**/examples/*.js"],
+  "testFiles": ["**/*.spec.ts"],
+  "trashAssetsBeforeRuns": true
+}

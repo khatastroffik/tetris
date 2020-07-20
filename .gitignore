@@ -4,8 +4,12 @@
 /dist
 /tmp
 /out-tsc
+/tsc
 # Only exists if Bazel was run
 /bazel-out
+/cypress/videos
+/cypress/screenshots
+
 
 # dependencies
 /node_modules
