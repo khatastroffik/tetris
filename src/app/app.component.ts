@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
+import { Grid, getEmptyGrid, placeTetrominoOnGrid, Tetromino, removeTetrominofromGrid, getTetrominoColorStyle, getTetromino, getNextTetromino } from './gameModel';
+import { interval, Observable } from 'rxjs';
+import { take } from 'rxjs/operators';
 
-type Grid = number[][];
+import { pauseSubject$, gameEngine2$, speed$, gameEngine1$ } from './gameEngine';
 
 @Component( {
   selector: 'k11k-root',
@@ -10,15 +13,38 @@ type Grid = number[][];
 export class AppComponent {
   title = 'Tetris';
   grid: Grid;
+  T: Tetromino;
+  source: Observable<number>;
+
   constructor() {
-    this.grid = Array( 20 ).fill( Array( 10 ).fill( 3, 0 ), 0 );
-    this.grid = Array( 20 ).fill( 0 ).map( _ => Array( 10 ).fill( 0 ) );
+    this.grid = getEmptyGrid();
+    this.T = { originX: 0, originY: 0, shape: [] };
+    this.source = interval( 250 ).pipe( take( 15 ) );
+    setTimeout( () => this.testEngine(), 1000);
+  }
 
+  getTetrominoColorStyle( color: number ): string {
+    return getTetrominoColorStyle( color );
+  }
 
-    this.grid[2][2] = 1;
-    this.grid[3][2] = 1;
-    this.grid[3][3] = 1;
-    this.grid[3][4] = 1;
-    console.table( this.grid );
+  start() {
+    this.grid = removeTetrominofromGrid( this.T, this.grid );
+    this.T = getTetromino();
+    this.grid = placeTetrominoOnGrid( this.T, this.grid );
+    this.source.subscribe( value => {
+      this.grid = removeTetrominofromGrid( this.T, this.grid );
+      this.T.originY += 1;
+      this.grid = placeTetrominoOnGrid( this.T, this.grid );
+    } );    
+  }
+
+  testEngine(){
+    gameEngine1$.pipe(take( 10 )).subscribe(() => console.log( 'GAME ENGINE 1' ));
+    gameEngine2$.pipe(take( 10 )).subscribe(() => console.log( 'GAME ENGINE 2' ));
+    pauseSubject$.subscribe(paused => console.log('PAUSED: ', paused ) );
+    setTimeout( () => speed$.next(800), 2500 );
+    setTimeout( () => pauseSubject$.next(true), 4000 );
+    setTimeout( () => speed$.next(500), 7000 );
+    setTimeout( () => pauseSubject$.next(false), 9000 );
   }
 }

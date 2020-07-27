@@ -32,7 +32,7 @@
 
     "dev:test": "jest --watch --verbose",
     "dev:build": "ng build --watch",
-    "dev:serve": "npx http-server dist/tetris -p 4200 -o",
+    "dev:serve": "npx http-server dist/tetris -p 4200 -o -c-1",
 
     "ng": "ng",
     "start": "ng serve",

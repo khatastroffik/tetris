@@ -12,7 +12,7 @@
             <div class="cell"></div>  
           </ng-template>
           <ng-template #cellContent>
-            <div class="cell cellContent"></div>
+            <div class="cell {{getTetrominoColorStyle(cell)}}"></div>
           </ng-template>
           
         </ng-container>
@@ -24,6 +24,7 @@
     <p>Level<br>{{0}}</p>
     <p>Score<br>{{0}}</p>
     <p>Rows<br>{{0}}</p>    
+    <button (click)="start()">start</button>
   </div>
   <div class="footer">
     <button>drop</button>
