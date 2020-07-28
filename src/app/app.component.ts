@@ -3,7 +3,7 @@ import { Grid, getEmptyGrid, placeTetrominoOnGrid, Tetromino, removeTetrominofro
 import { interval, Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 
-import { pauseSubject$, gameEngine2$, speed$, gameEngine1$ } from './gameEngine';
+import { pauseSubject$, gameEngine2$, speed$, gameEngine1$, gameEngine$ } from './gameEngine';
 
 @Component( {
   selector: 'k11k-root',
@@ -39,8 +39,10 @@ export class AppComponent {
   }
 
   testEngine(){
-    gameEngine1$.pipe(take( 10 )).subscribe(() => console.log( 'GAME ENGINE 1' ));
-    gameEngine2$.pipe(take( 10 )).subscribe(() => console.log( 'GAME ENGINE 2' ));
+    // gameEngine1$.pipe(take( 10 )).subscribe(() => console.log( 'GAME ENGINE 1' ));
+    gameEngine$.subscribe();
+    // gameEngine$.subscribe((state) => console.log( 'STATE LOOP', state.loop ));
+    // gameEngine2$.pipe(take( 10 )).subscribe(() => console.log( 'GAME ENGINE 2' ));
     pauseSubject$.subscribe(paused => console.log('PAUSED: ', paused ) );
     setTimeout( () => speed$.next(800), 2500 );
     setTimeout( () => pauseSubject$.next(true), 4000 );

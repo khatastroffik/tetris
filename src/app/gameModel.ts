@@ -165,3 +165,16 @@ export function getNextTetromino(): Tetromino {
   const nextShapeIndex = Bag[0];
   return { ...ShapeOrigins[nextShapeIndex], shape: Shapes[nextShapeIndex] };
 }
+
+export type State = {
+  grid: Grid,
+  currentTetromino: Tetromino | undefined ,
+  nextTetromino: Tetromino | undefined,
+  level: number,
+  score: number,
+  lines: number,
+  speed: number,
+  paused: boolean,
+  over: boolean,
+  loop: number
+};
