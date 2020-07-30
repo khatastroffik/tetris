@@ -1,27 +1,13 @@
-import { interval, EMPTY, BehaviorSubject, Observable, of, combineLatest, fromEvent, noop } from 'rxjs';
-import { take, distinctUntilChanged, switchMap, windowToggle, filter, flatMap, tap, scan, mapTo, startWith, pluck, map } from 'rxjs/operators';
-import { State, Grid, Tetromino, getEmptyGrid } from './gameModel'
-import { flatten } from '@angular/compiler';
+import { interval, EMPTY, BehaviorSubject, Observable, of, combineLatest, fromEvent, noop, merge } from 'rxjs';
+import { take, distinctUntilChanged, switchMap, windowToggle, filter, flatMap, tap, scan, mapTo, startWith, pluck, map, share, repeat, repeatWhen } from 'rxjs/operators';
+import { State, Grid, Tetromino, getEmptyGrid, getTetromino, getNextTetromino, placeTetrominoOnGrid, removeTetrominofromGrid, GameKeys } from './gameModel'
 
-/**
- * implementation of a game pause
- */
-export const pauseSubject$ = new BehaviorSubject( false );
-const pause$ = pauseSubject$.pipe( distinctUntilChanged() );
+const EmptyTetromino: Tetromino = { originX: 0, originY: 0, shape: Array( 4 ).fill( 0 ).map( _ => Array( 4 ).fill( 0 ) ) };
 
-/**
- * implementation of game speed
- */
-export const speed$ = new BehaviorSubject( 1000 );
-export const loop$ = speed$.pipe(
-  switchMap( speed => interval( speed ) )
-);
-
-
-const initialState: State = {
+const EmptyState: State = {
   grid: getEmptyGrid(),
-  currentTetromino: undefined,
-  nextTetromino: undefined,
+  currentTetromino: EmptyTetromino,
+  nextTetromino: EmptyTetromino,
   level: 1,
   score: 0,
   lines: 0,
@@ -31,125 +17,141 @@ const initialState: State = {
   loop: -1
 };
 
-const gameState$: Observable<State> = of( initialState );
+export const EmptyGameEngine$ = of( EmptyState );
+
+function initialState(): State {
+  const newState = {
+    grid: getEmptyGrid(),
+    currentTetromino: getTetromino(),
+    nextTetromino: getNextTetromino(),
+    level: 1,
+    score: 0,
+    lines: 0,
+    speed: 1000,
+    paused: false,
+    over: false,
+    loop: -1
+  };
+  newState.grid = placeTetrominoOnGrid( newState.currentTetromino, newState.grid );
+  return newState;
+};
 
 /**
- * Game loop utilizing "switchMap". The loop count is globally persisted!
+ * implementation of a game pause
  */
-export const gameEngine1$ = pause$.pipe(
-  switchMap( paused => paused ? EMPTY : loop$ ),
-  scan<number, number>( ( loops, _ ) => loops += 1, -1 )
+export const pauseSubject$ = new BehaviorSubject( false );
+const pause$ = pauseSubject$.pipe(
+  startWith( false ),
+  distinctUntilChanged(),
+  map( paused => { return { action: 'PAUSE', value: paused } } )
 );
 
 /**
- * Game engine utilizing "windowToggle"
+ * implementation of game speed
  */
-const on$ = pause$.pipe( filter( paused => paused === true ) );
-const off$ = pause$.pipe( filter( paused => !paused ) );
-export const gameEngine2$ = loop$.pipe(
-  windowToggle( off$, () => on$ ),
-  flatMap( values => values )
+export const speed$ = new BehaviorSubject( 1000 );
+export const loop$ = speed$.pipe(
+  switchMap( speed => interval( speed ) )
 );
 
-export const gameLoop$ = pause$.pipe(
-  switchMap( paused => paused ? EMPTY : loop$ ),
+const gameLoop$ = pause$.pipe(
+  switchMap( action => action.value ? EMPTY : loop$ ),
   scan<number, number>( ( loops, _ ) => loops += 1, -1 ),
-  take(10)
+  map( loop => { return { action: 'LOOP', value: loop } } )
 );
 
-export const gameInput$ = fromEvent<Event>(document, 'keyup').pipe(
-  startWith( {code: undefined} ),
-  pluck<Event | {code: undefined}, string>('code')
+const keyboardIinput$ = fromEvent<Event>( document, 'keyup' );
+
+const gameInput$ = pause$.pipe(
+  switchMap( action => action.value ? EMPTY : keyboardIinput$ ),
+  pluck<Event, string>( 'code' ),
+  filter(code => GameKeys.includes(code)),
+  map( code => { return { action: 'KEYUP', value: code } } )
 );
 
-export const gameEngine$ = combineLatest( gameLoop$, gameInput$ ).pipe(
-  scan<[number, string], State>( ( state, [currentLoop, currentKeycode] ) => {
-    if ( state.loop != currentLoop ) {
-      state.loop = currentLoop;
-      console.log('LOOP = ', currentLoop);
-    } else {
-      console.log('KEY = ', currentKeycode);
+type GameEvent = {
+  action: string;
+  value: any;
+}
+
+export const gameEngine$ = merge( gameLoop$, gameInput$, pause$ ).pipe(
+  scan<GameEvent, State>( ( gameState, gameEvent ) => {
+    switch ( gameEvent.action ) {
+      case "PAUSE":
+        // console.log( 'PAUSE: ', gameEvent.value );
+        gameState.paused = gameEvent.value;
+        break;
+      case "LOOP":
+        // console.log( 'LOOP: ', gameEvent.value );
+        drop( gameState );
+        gameState.score += 1;
+        gameState.loop = gameEvent.value;
+        break;
+      case "KEYUP":
+        // console.log( 'KEYUP: ', gameEvent.value );
+        move( gameEvent.value, gameState );
+        break;
+      default:
+        break;
     }
-    return state;
+    return gameState;
   },
-  initialState
+    initialState()
   ),
 )
-// export const gameEngine$ = combineLatest( gameLoop$, gameState$ ).pipe(
-//   tap( ( [num, _] ) => console.log( 'loop=', num) ),
 
-//   scan<[number, State], State>( ( state, [currentNumber, currentState] ) => {
-//     if (state === undefined) state = currentState;
-//     if ( state.loop != currentNumber ) state.loop = currentNumber;
-//     console.log('NEW STATE: ', state.loop);
-//     return state;
-//   },
-//   initialState
-//   ),
-//   tap( ( st ) => console.log( 'combined state.loop', st.loop ) ),
-// )
-
-// export const gameEngine$ = combineLatest( gameEngine1$, gameState$ ).pipe(
-//   tap( ( [num, st] ) => console.log( 'loop=', num, ' state.loop= ', st.loop ) ),
-
-//   scan<[number, State], State>( ( state, [currentNumber, currentState] ) => (
-//     ( state.loop != currentNumber ) && ( state.loop = currentNumber ), 
-//     state
-//   ),
-//     initialState
-//   ),
-//   tap( ( st ) => console.log( 'combined state.loop', st.loop ) ),
-// )
-
-
-export interface State2 {
-  game: number[][];
-  x: number;
-  y: number;
-  score: number;
-}
-
-export interface Key {
-  code: string;
-}
-
-export type Brick = number[][];
-
-const player$ = combineLatest(
-  of( [[1, 1, 1], [1, 1, 1]] ),
-  of( { code: '' } ),
-  fromEvent( document, 'keyup' ).pipe(
-    startWith( { code: undefined } ),
-    pluck( 'code' )
-  )
-).pipe(
-  map(
-    ( [brick, key, keyCode]: [Brick, Key, unknown] ) => (
-      ( key.code = <string>keyCode ), [brick, key]
+function drop( gameState: State, toBottom = false ): boolean {
+  let dropped = false;
+  gameState.grid = removeTetrominofromGrid( gameState.currentTetromino, gameState.grid );
+  if ( gameState.currentTetromino.shape.every( ( row, rowIndex ) => row.every( ( cell, columnIndex ) =>
+    ( cell === 0 ) ||
+    (
+      ( gameState.currentTetromino.originY + rowIndex < 19 ) &&
+      ( gameState.grid[gameState.currentTetromino.originY + rowIndex + 1][gameState.currentTetromino.originX + columnIndex] === 0 )
     )
-  )
-);
+  ) ) ) {
+    gameState.currentTetromino.originY += 1;
+    dropped = true;
+  } else {
+    gameState.grid = placeTetrominoOnGrid( gameState.currentTetromino, gameState.grid );
+    gameState.currentTetromino = getTetromino();
+    gameState.nextTetromino = getNextTetromino();
+  }
+  gameState.grid = placeTetrominoOnGrid( gameState.currentTetromino, gameState.grid );
+  return dropped;
+}
 
-const state$ = interval( 1000 ).pipe(
-  scan<number, State2>( ( state, _ ) => ( state.score++, state ), { game: [[1]], x: 0, y: 0, score: 0 } )
-  // scan<number, State2>( ( state, _ ) => ( state.score++, state ), {game: [[1]], x:0, y:0, score:0} )
-);
+function rotateRight( shape: number[][] ): number[][] {
+  return shape[0].map( ( val, index ) => shape.map( row => row[index] ).reverse() );
+}
 
-let state;
-let brick;
+function rotateLeft( shape: number[][] ): number[][] {
+  return shape[0].map( ( val, index ) => shape.map( row => row[index] ) ).reverse();
+}
 
-const ROTAT = ( [newState, rotatedBrick]: [State2, Brick] ) => { ( state = newState ); ( brick = rotatedBrick ) };
-const COLLI = ( [newState, collidedBrick]: [State2, Brick] ) => { ( state = newState ); ( brick = collidedBrick ) };
-
-const game$ = combineLatest( state$, player$ ).pipe(
-  // scan<[State, [Brick, Key]], [State, [Brick, Key]]>(
-  scan(
-    ( [state, [brick, key]] ) => (
-      state = state,
-      ROTAT( [state, <Brick>brick] ),
-      COLLI( [state, <Brick>brick] ),
-      state = state,
-      key = key,
-      [state, [brick, key]]
-    ) ),
-);
+function move( move: string, gameState: State ): boolean {
+  gameState.grid = removeTetrominofromGrid( gameState.currentTetromino, gameState.grid );
+  switch ( move ) {
+    case 'ArrowLeft':
+      if ( gameState.currentTetromino.shape.every( ( row ) => row.every( ( cell, columnIndex ) => ( cell === 0 ) || ( gameState.currentTetromino.originX + columnIndex > 0 ) ) ) ) gameState.currentTetromino.originX -= 1;
+      break;
+    case 'ArrowRight':
+      if ( gameState.currentTetromino.shape.every( ( row ) => row.every( ( cell, columnIndex ) => ( cell === 0 ) || ( gameState.currentTetromino.originX + columnIndex < 9 ) ) ) ) gameState.currentTetromino.originX += 1;
+      break;
+    case 'Space':
+      while ( drop( gameState ) ) {
+        gameState.score += 1;
+      }
+      break;
+    case 'ArrowUp':
+      gameState.currentTetromino.shape = rotateRight(gameState.currentTetromino.shape);
+      break;
+      case 'ArrowDown':
+        gameState.currentTetromino.shape = rotateLeft(gameState.currentTetromino.shape);
+      break;
+    default:
+      break;
+  }
+  gameState.grid = placeTetrominoOnGrid( gameState.currentTetromino, gameState.grid );
+  return true;
+}

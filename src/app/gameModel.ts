@@ -12,6 +12,14 @@ export type Tetromino = {
   shape: Grid;
 }
 
+export const GameKeys: Array<string> = [
+  'ArrowUp', // rotate Tetromino clockwise
+  'ArrowDown', // rotate Tetromino counter-clockwise
+  'ArrowLeft', // move Tetromino to the left
+  'ArrowRight', // move Tetromino to the right
+  'Space' // drop Tetromino
+];
+
 /**
  *  CSS style name for the colors of the Tetrominos
  */
@@ -168,8 +176,8 @@ export function getNextTetromino(): Tetromino {
 
 export type State = {
   grid: Grid,
-  currentTetromino: Tetromino | undefined ,
-  nextTetromino: Tetromino | undefined,
+  currentTetromino: Tetromino  ,
+  nextTetromino: Tetromino ,
   level: number,
   score: number,
   lines: number,

@@ -1,37 +1,61 @@
-<div id="tetris">
-  <div class="title">
-    A <a href="https://www.khatastroffik.net">Khatastroffik</a> open source <b>{{title}}</b> clone
-  </div>
-  <div class="board">
-    <div class="grid">
-      <div class="grid-background"></div>  
-      <ng-container *ngFor="let row of grid">
-        <ng-container *ngFor="let cell of row">         
-          <ng-container *ngIf="cell===0; then emptyCell; else cellContent"></ng-container>
-          <ng-template #emptyCell>
-            <div class="cell"></div>  
-          </ng-template>
-          <ng-template #cellContent>
-            <div class="cell {{getTetrominoColorStyle(cell)}}"></div>
-          </ng-template>
-          
+<ng-container *ngIf="gameState$ | async as gameState">
+  <div id="tetris">
+    <div class="title">
+      A <a href="https://www.khatastroffik.net">Khatastroffik</a> open source <b>{{title}}</b> clone
+    </div>
+    <div class="board">
+      <div class="grid">
+        <div class="grid-background"></div>
+        <ng-container *ngFor="let row of gameState.grid">
+          <ng-container *ngFor="let cell of row">
+            <ng-container *ngIf="cell===0; then emptyCell; else cellContent"></ng-container>
+            <ng-template #emptyCell>
+              <div class="cell"></div>
+            </ng-template>
+            <ng-template #cellContent>
+              <div class="cell {{getTetrominoColorStyle(cell)}}"></div>
+            </ng-template>
+          </ng-container>
         </ng-container>
-        
-      </ng-container>
+      </div>
+    </div>
+    <div class="score">
+      <p>Level<br>{{gameState.level}}</p>
+      <p>Score<br>{{gameState.score}}</p>
+      <p>Rows<br>{{gameState.lines}}</p>
+      <p>Loops<br>{{gameState.loop}}</p>
+      <p>Speed<br>{{(1000 / gameState.speed ).toFixed(2).toString() + ' / sec'}}</p>
+      <p>Next Tetro</p>
+
+      <div class="minigrid">
+        <ng-container *ngFor="let row of gameState.nextTetromino.shape">
+          <ng-container *ngFor="let cell of row">
+            <ng-container *ngIf="cell===0; then emptyCell; else cellContent"></ng-container>
+            <ng-template #emptyCell>
+              <div class="cell"></div>
+            </ng-template>
+            <ng-template #cellContent>
+              <div class="cell {{getTetrominoColorStyle(cell)}}"></div>
+            </ng-template>
+          </ng-container>
+          <ng-container *ngFor="let item of [].constructor(4-gameState.nextTetromino.shape.length)">
+            <div class="cell"></div>
+          </ng-container>
+        </ng-container>
+        <ng-container *ngFor="let item of [].constructor(4*(4-gameState.nextTetromino.shape.length))">
+          <div class="cell"></div>
+        </ng-container>
+      </div>
+      
+      <button (click)="start()">start</button>
+    </div>
+    <div class="footer">
+      <button>drop</button>
+      <button>rotate</button>
+      <button>left</button>
+      <button>right</button>
     </div>
   </div>
-  <div class="score">
-    <p>Level<br>{{0}}</p>
-    <p>Score<br>{{0}}</p>
-    <p>Rows<br>{{0}}</p>    
-    <button (click)="start()">start</button>
-  </div>
-  <div class="footer">
-    <button>drop</button>
-    <button>rotate</button>
-    <button>left</button>
-    <button>right</button>
-  </div>
-</div>
+</ng-container>
 
 <router-outlet></router-outlet>
