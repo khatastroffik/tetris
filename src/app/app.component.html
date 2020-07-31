@@ -24,7 +24,6 @@
       <p>Level<br>{{gameState.level}}</p>
       <p>Rows<br>{{gameState.lines}}</p>
       <p>Drops<br>{{(1000 / gameState.speed ).toFixed(2).toString() + '/s'}}</p>
-      <!-- <p>Loops<br>{{gameState.loop}}</p> -->
       <p>Next</p>
 
       <div class="minigrid">
@@ -46,6 +45,8 @@
           <div class="cell"></div>
         </ng-container>
       </div>
+
+      <p>{{gameState.paused? 'paused': ''}}</p>
       
       <button (click)="start()">start</button>
     </div>

@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Grid, getEmptyGrid, placeTetrominoOnGrid, Tetromino, removeTetrominofromGrid, getTetrominoColorStyle, getTetromino, getNextTetromino, State } from './gameModel';
-import { interval, Observable } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { getTetrominoColorStyle,  State } from './gameModel';
+import { Observable, fromEvent } from 'rxjs';
+import { take, pluck, filter, scan } from 'rxjs/operators';
 
-import { pauseSubject$, speed$, gameEngine$, EmptyGameEngine$ } from './gameEngine';
+import { pauseSubject$, gameEngine$, emptyGameEngine$ } from './gameEngine';
 
 @Component( {
   selector: 'k11k-root',
@@ -13,18 +13,21 @@ import { pauseSubject$, speed$, gameEngine$, EmptyGameEngine$ } from './gameEngi
 export class AppComponent implements OnInit {
   title = 'Tetris';
   gameState$: Observable<State>;
+  pause$: Observable<boolean>;
 
   ngOnInit(): void {
-    // speed$.next( 80 );
-    
-    // setTimeout( () => speed$.next( 800 ), 2500 );
     // setTimeout( () => pauseSubject$.next( true ), 4000 );
-    // setTimeout( () => speed$.next( 500 ), 7000 );
     // setTimeout( () => pauseSubject$.next( false ), 9000 );
+    this.pause$.subscribe( (paused: boolean) => pauseSubject$.next( paused));
   }
 
   constructor() {
-    this.gameState$ = EmptyGameEngine$;
+    this.gameState$ = emptyGameEngine$;
+    this.pause$ = fromEvent<Event>( document, 'keyup' ).pipe(
+      pluck<Event, string>( 'code' ),
+      filter( code => code === 'Escape' ) ,
+      scan<string, boolean>( (paused: boolean) => !paused, false )
+    );
   }
 
   start() {

@@ -85,11 +85,38 @@ export function getEmptyGrid(): Grid {
   return Array( 20 ).fill( 0 ).map( _ => Array( 10 ).fill( 0 ) );
 }
 
+export function getEmptyTetromino(): Tetromino {
+  return { originX: 0, originY: 0, shape: Array( 4 ).fill( 0 ).map( _ => Array( 4 ).fill( 0 ) ) };
+}
+
+export function getEmptyState(): State {
+  return {
+    grid: getEmptyGrid(),
+    currentTetromino: getEmptyTetromino(),
+    nextTetromino: getEmptyTetromino(),
+    level: 1,
+    score: 0,
+    lines: 0,
+    speed: getLevelSpeed( 1 ),
+    paused: false,
+    over: false
+  };
+}
+
+export function getInitialState(): State {
+  const newState = { ...getEmptyState(),
+    currentTetromino: getTetromino(),
+    nextTetromino: getNextTetromino(),
+  };
+  newState.grid = placeTetrominoOnGrid( newState.currentTetromino, newState.grid );
+  return newState;
+};
+
 export const ClearedLinesScore: number[] = [
   0, 100, 300, 500, 800, 1200, 1500
 ];
 
-export function getClearedLinesScore(clearedLines: number): number {
+export function getClearedLinesScore( clearedLines: number ): number {
   return ClearedLinesScore[clearedLines];
 }
 const LevelSpeed = [
@@ -106,7 +133,7 @@ const LevelLines = [
 ];
 
 export function getLevelFromLines( lines: number ): number {
-  return LevelLines.findIndex( ( levellines ) => lines < levellines ) ;
+  return LevelLines.findIndex( ( levellines ) => lines < levellines );
 }
 
 /**
@@ -207,6 +234,5 @@ export type State = {
   lines: number,
   speed: number,
   paused: boolean,
-  over: boolean,
-  loop: number
+  over: boolean
 };
