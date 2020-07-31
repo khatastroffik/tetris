@@ -20,12 +20,12 @@
       </div>
     </div>
     <div class="score">
-      <p>Level<br>{{gameState.level}}</p>
       <p>Score<br>{{gameState.score}}</p>
+      <p>Level<br>{{gameState.level}}</p>
       <p>Rows<br>{{gameState.lines}}</p>
-      <p>Loops<br>{{gameState.loop}}</p>
-      <p>Speed<br>{{(1000 / gameState.speed ).toFixed(2).toString() + ' / sec'}}</p>
-      <p>Next Tetro</p>
+      <p>Drops<br>{{(1000 / gameState.speed ).toFixed(2).toString() + '/s'}}</p>
+      <!-- <p>Loops<br>{{gameState.loop}}</p> -->
+      <p>Next</p>
 
       <div class="minigrid">
         <ng-container *ngFor="let row of gameState.nextTetromino.shape">
@@ -50,10 +50,10 @@
       <button (click)="start()">start</button>
     </div>
     <div class="footer">
-      <button>drop</button>
+      <!-- <button>drop</button>
       <button>rotate</button>
       <button>left</button>
-      <button>right</button>
+      <button>right</button> -->
     </div>
   </div>
 </ng-container>

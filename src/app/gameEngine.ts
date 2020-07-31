@@ -1,6 +1,6 @@
 import { interval, EMPTY, BehaviorSubject, Observable, of, combineLatest, fromEvent, noop, merge } from 'rxjs';
 import { take, distinctUntilChanged, switchMap, windowToggle, filter, flatMap, tap, scan, mapTo, startWith, pluck, map, share, repeat, repeatWhen } from 'rxjs/operators';
-import { State, Grid, Tetromino, getEmptyGrid, getTetromino, getNextTetromino, placeTetrominoOnGrid, removeTetrominofromGrid, GameKeys } from './gameModel'
+import { State, Grid, Tetromino, getEmptyGrid, getTetromino, getNextTetromino, placeTetrominoOnGrid, removeTetrominofromGrid, GameKeys, ClearedLinesScore, getLevelSpeed, getLevelFromLines, getClearedLinesScore } from './gameModel'
 
 const EmptyTetromino: Tetromino = { originX: 0, originY: 0, shape: Array( 4 ).fill( 0 ).map( _ => Array( 4 ).fill( 0 ) ) };
 
@@ -11,26 +11,19 @@ const EmptyState: State = {
   level: 1,
   score: 0,
   lines: 0,
-  speed: 1000,
+  speed: getLevelSpeed(1),
   paused: false,
   over: false,
-  loop: -1
+  loop: 0
 };
 
 export const EmptyGameEngine$ = of( EmptyState );
 
 function initialState(): State {
-  const newState = {
+  const newState = { ...EmptyState,
     grid: getEmptyGrid(),
     currentTetromino: getTetromino(),
     nextTetromino: getNextTetromino(),
-    level: 1,
-    score: 0,
-    lines: 0,
-    speed: 1000,
-    paused: false,
-    over: false,
-    loop: -1
   };
   newState.grid = placeTetrominoOnGrid( newState.currentTetromino, newState.grid );
   return newState;
@@ -49,8 +42,9 @@ const pause$ = pauseSubject$.pipe(
 /**
  * implementation of game speed
  */
-export const speed$ = new BehaviorSubject( 1000 );
+export const speed$ = new BehaviorSubject( getLevelSpeed(1) );
 export const loop$ = speed$.pipe(
+  // tap( newSpeed => console.log('SPEED: ', newSpeed)),
   switchMap( speed => interval( speed ) )
 );
 
@@ -89,16 +83,41 @@ export const gameEngine$ = merge( gameLoop$, gameInput$, pause$ ).pipe(
         break;
       case "KEYUP":
         // console.log( 'KEYUP: ', gameEvent.value );
-        move( gameEvent.value, gameState );
+        move( gameEvent.value, gameState );        
         break;
       default:
         break;
     }
+    const clearedLines = clearLines( gameState );
+    gameState.lines += clearedLines;
+    gameState.score += getClearedLinesScore( clearedLines );
+    gameState.level = getLevelFromLines(gameState.lines);
+    gameState.speed = updateSpeed( gameState );
     return gameState;
   },
     initialState()
   ),
 )
+
+function updateSpeed( gameState: State ): number {
+  let newSpeed = getLevelSpeed(gameState.level);
+  if (newSpeed != gameState.speed) speed$.next(newSpeed);
+  return newSpeed;
+}
+
+function clearLines( gameState: State ): number {
+  let clearedLines = 0;
+  gameState.grid = removeTetrominofromGrid( gameState.currentTetromino, gameState.grid );
+  gameState.grid.forEach( (row, rowIndex) => {
+    if (row.every( cell => cell > 0 )) {
+      gameState.grid.splice(rowIndex, 1);
+      gameState.grid.unshift( Array( 10 ).fill( 0 ) );
+      clearedLines += 1;
+    }
+  });
+  gameState.grid = placeTetrominoOnGrid( gameState.currentTetromino, gameState.grid );
+  return clearedLines;
+}
 
 function drop( gameState: State, toBottom = false ): boolean {
   let dropped = false;

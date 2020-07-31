@@ -15,7 +15,7 @@ export class AppComponent implements OnInit {
   gameState$: Observable<State>;
 
   ngOnInit(): void {
-    speed$.next( 400 );
+    // speed$.next( 80 );
     
     // setTimeout( () => speed$.next( 800 ), 2500 );
     // setTimeout( () => pauseSubject$.next( true ), 4000 );

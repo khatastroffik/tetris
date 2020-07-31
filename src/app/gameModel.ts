@@ -85,6 +85,30 @@ export function getEmptyGrid(): Grid {
   return Array( 20 ).fill( 0 ).map( _ => Array( 10 ).fill( 0 ) );
 }
 
+export const ClearedLinesScore: number[] = [
+  0, 100, 300, 500, 800, 1200, 1500
+];
+
+export function getClearedLinesScore(clearedLines: number): number {
+  return ClearedLinesScore[clearedLines];
+}
+const LevelSpeed = [
+  800, 720, 648, 583, 524, 471, 423, 380, 342, 307, 276, 248, 223, 200, 180, 162, 145, 130, 117, 105, 94, 84
+];
+
+export function getLevelSpeed( level: number ): number {
+  return LevelSpeed[( level > 0 ) ? ( level - 1 ) : 0] ?? 80;
+}
+
+const LevelLines = [
+  // 10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 24, 27, 30, 33, 37, 41, 46, 51, 57, 64, 72, 80
+  0, 10, 21, 33, 46, 60, 75, 91, 109, 129, 151, 175, 202, 232, 265, 302, 343, 389, 440, 497, 561, 633, 713, 800
+];
+
+export function getLevelFromLines( lines: number ): number {
+  return LevelLines.findIndex( ( levellines ) => lines < levellines ) ;
+}
+
 /**
  * Retrieve the CSS style name for the given color code as stored in the Tetromino shape
  *
@@ -176,8 +200,8 @@ export function getNextTetromino(): Tetromino {
 
 export type State = {
   grid: Grid,
-  currentTetromino: Tetromino  ,
-  nextTetromino: Tetromino ,
+  currentTetromino: Tetromino,
+  nextTetromino: Tetromino,
   level: number,
   score: number,
   lines: number,
