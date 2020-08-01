@@ -1,21 +1,29 @@
-# Tetris
+# Tetris (work-in-progress)
 
-## project setup
+A [Khatastroffik](https://www.khatastroffik.net) open source **Tetris** clone.
 
-- generate angular v10 application:
-`npx -p @angular/cli@10 ng new tetris --routing=true --prefix=k11k --strict=true --style=scss`
-- replace karma with jest test framework:
-  - install dependencies:
-  `npm install jest jest-preset-angular @types/jest ts-jest jest-extended --save-dev`
-  - see: [how-to-set-up-angular-unit-testing-with-jest](https://www.amadousall.com/how-to-set-up-angular-unit-testing-with-jest/)
-  - see: [How to use Jest in Angular](https://itnext.io/how-to-use-jest-in-angular-aka-make-unit-testing-great-again-e4be2d2e92d1)
-  - add option `setupFilesAfterEnv: ['jest-extended'],` to `jest.config.js`
-  - add `import 'zone.js/dist/zone';` to `src/test.ts`
-  - uninstall karma:
-  `npm uninstall karma karma-chrome-launcher karma-coverage-istanbul-reporter karma-jasmine karma-jasmine-html-reporter jasmine-core jasmine-spec-reporter @types/jasmine @types/jasminewd2`
-  - see also: [briebug/jest-schematic](https://github.com/briebug/jest-schematic) (not working with angular 10 at the moment)
-- replace protractor with cypress e2e test framework:
-  - see: [CI ready e2e tests for Angular with Cypress and TypeScript in under 60 minutes](https://dev.to/angular/ci-ready-e2e-tests-for-angular-with-cypress-and-typescript-in-under-60-minutes-4f30)
-  - see: [Switching to Cypress from Protractor in Less Than 30 Seconds](https://medium.com/briebug-blog/switching-to-cypress-from-protractor-in-less-than-30-seconds-b60b00def4a0)
-  - see: [Adding Cypress UI Tests to Your DevOps Pipeline](https://www.cypress.io/blog/2019/08/02/guest-post-angular-adding-cypress-ui-tests-to-your-devops-pipeline)
-  - see: [cypress-and-jest-typescript-example](https://github.com/cypress-io/cypress-and-jest-typescript-example)
+## Proof-of-Concept
+
+This Angular web application is a **PoC** combining the following:
+
+- [x] **SoC** (Separation of Concern) &rightarrow; decoupling UI and game engine implementation
+- [x] **RMD** (Responsive and Mobile design) &rightarrow; playable with keyboard or buttons, sized for any device (not relying on media queries, though)
+- [x] **ReactiveX** (Reactive Extensions) &rightarrow; asynchronous programming with **RxJs** observables
+- [x] **CSS grid** (grid layout) &rightarrow; pure HTML5 & CSS3 design (requires use of a modern browser)
+- [ ] **PWA** (Progressive Web App) &rightarrow; 1 source for "*browser*" or "*local install &amp; offline*" usage
+
+## Tetris game
+
+The *well-known* **Tetris game** - hence having well-defined requirements - is implemented with respect to:
+
+- [x] SRS
+- [x] wall bounce back
+- [x] progressive difficulty (up to 20 levels) and scoring (e.g. multiple rows)
+- [x] pausable
+- [x] ...
+
+TODO: implement PWA (electron?)
+TODO: improve README!
+TODO: fix rotation bugs (on top of board, on the board sides)
+TODO: refactor app component: create sub components for board, next tetromino etc.
+TODO: implement help screen
