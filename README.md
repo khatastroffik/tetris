@@ -14,6 +14,8 @@ This Angular web application is a **PoC** combining the following:
 
 ## Tetris game
 
+![screenshot](tetris-screenshot-1.png)
+
 The *well-known* **Tetris game** - hence having well-defined requirements - is implemented with respect to:
 
 - [x] SRS
