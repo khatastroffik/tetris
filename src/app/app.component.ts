@@ -16,9 +16,7 @@ export class AppComponent implements OnInit {
   pause$: Observable<boolean>;
 
   ngOnInit(): void {
-    // setTimeout( () => pauseSubject$.next( true ), 4000 );
-    // setTimeout( () => pauseSubject$.next( false ), 9000 );
-    this.pause$.subscribe( (paused: boolean) => pauseSubject$.next( paused));
+    this.pause$.subscribe( (paused: boolean) => pauseSubject$.next( paused ));
   }
 
   constructor() {
@@ -31,7 +29,7 @@ export class AppComponent implements OnInit {
   }
 
   start() {
-    this.gameState$ = gameEngine$.pipe( take( 200 ) );
+    this.gameState$ = gameEngine$;
   }
 
   getTetrominoColorStyle( color: number ): string {

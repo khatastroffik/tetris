@@ -1,7 +1,7 @@
 <ng-container *ngIf="gameState$ | async as gameState">
   <div id="tetris">
     <div class="title">
-      A <a href="https://www.khatastroffik.net">Khatastroffik</a> open source <b>{{title}}</b> clone
+      A <a href="https://www.khatastroffik.net">Khatastroffik</a> open source <span class="greentext">{{title}}</span> clone
     </div>
     <div class="board">
       <div class="grid">
@@ -26,10 +26,10 @@
       </div>
     </div>
     <div class="score">
-      <p>Score<br>{{gameState.score}}</p>
-      <p>Level<br>{{gameState.level}}</p>
-      <p>Rows<br>{{gameState.lines}}</p>
-      <p>Drops<br>{{(1000 / gameState.speed ).toFixed(2).toString() + '/s'}}</p>
+      <p>Score<br><span class="greentext">{{gameState.score}}</span></p>
+      <p>Level<br><span class="greentext">{{gameState.level}}</span></p>
+      <p>Lines<br><span class="greentext">{{gameState.lines}}</span></p>
+      <p>Drops<br><span class="greentext">{{(1000 / gameState.speed ).toFixed(1).toString() + '/s'}}</span></p>
       <p>Next</p>
 
       <div class="minigrid">

@@ -7,6 +7,10 @@ a {
   color: greenyellow;
 }
 
+.greentext {
+  color: greenyellow;
+}
+
 #tetris {
   display: grid;
   grid-template-areas:
@@ -31,8 +35,6 @@ a {
 .board {
   grid-area: board;
   background-color: rgb(18, 44, 44) !important;
-  // background-color: rgb(24, 59, 59) !important;
-  // background-color: black !important;
   z-index: -10;
 }
 
@@ -58,6 +60,14 @@ a {
 
 .score {
   grid-area: score;
+  display: flex ;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.score > p {
+  margin: 4px 0 !important;
 }
 
 .message {
@@ -71,7 +81,7 @@ a {
 }
 
 .paused, .gameover {
-  font-size: 3rem;
+  font-size: 2rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -92,20 +102,9 @@ a {
 }
 
 .cell {
-  // ** alternative backrounds ***
-  // background-color: greenyellow;
-  // background-color: lightgreen;
-  // background-color: mediumaquamarine;
-  // background-color: cadetblue;
   // background-color: darkseagreen;
   background-color: rgb(24, 59, 59);
 }
-
-// *** black & white ***
-// .coloredCell {
-//   border: 1px solid darkseagreen;
-//   background-color: black;
-// }
 
 .red {
   border-top: 3px solid lighten(red, 30%);
@@ -162,16 +161,6 @@ a {
   border-right: 3px solid darken(orange, 16%);
   background-color: orange;
 }
-
-
-// $cellColor: red;
-// .cellContent {
-//   border-top: 3px solid lighten($cellColor, 30%);
-//   border-bottom: 3px solid darken($color: $cellColor, $amount: 26%);
-//   border-left: 3px solid darken($color: $cellColor, $amount: 8%);
-//   border-right: 3px solid darken($color: $cellColor, $amount: 16%);
-//   background-color: $cellColor;
-// }
 
 .grid-background {
   background-color: #444;
