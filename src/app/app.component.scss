@@ -60,6 +60,33 @@ a {
   grid-area: score;
 }
 
+.message {
+  background-color: rgba(11, 63, 13, 0.75);
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+  position: absolute;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+}
+
+.paused, .gameover {
+  font-size: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-weight: bold;
+}
+.paused {
+  border: 3px solid greenyellow;
+  color: greenyellow;
+}
+.gameover { 
+  border: 3px solid firebrick;
+  color: firebrick ;
+}
+
 .footer {
   grid-area: footer;
 }

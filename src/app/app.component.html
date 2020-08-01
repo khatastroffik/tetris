@@ -17,6 +17,12 @@
             </ng-template>
           </ng-container>
         </ng-container>
+        <div class="message" [style.visibility]="(gameState.paused && !gameState.over)? 'visible': 'hidden'">
+          <div class="paused">PAUSED</div>
+        </div>
+        <div class="message" [style.visibility]="gameState.over? 'visible': 'hidden'">
+          <div class="gameover">GAME OVER</div>
+        </div>        
       </div>
     </div>
     <div class="score">
@@ -46,8 +52,6 @@
         </ng-container>
       </div>
 
-      <p>{{gameState.paused? 'paused': ''}}</p>
-      
       <button (click)="start()">start</button>
     </div>
     <div class="footer">

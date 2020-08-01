@@ -113,8 +113,13 @@ function drop( gameState: State, toBottom = false ): void {
     ) ) ) {
       gameState.currentTetromino.originY += 1;
       dropped = true;
+    } else if ( gameState.currentTetromino.originY <= 0 ) {
+      // game over
+      gameState.over = true;
+      pauseSubject$.next(true);
+      dropped = false;
     } else {
-      // this tetromino is 'done' and should be fixed on the game grid
+      // the current tetromino is 'done' and should be fixed on the game grid
       gameState.grid = placeTetrominoOnGrid( gameState.currentTetromino, gameState.grid );
       gameState.currentTetromino = getTetromino();
       gameState.nextTetromino = getNextTetromino();
